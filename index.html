@@ -126,6 +126,7 @@
 
     /* ÁREA DO GRÁFICO */
     .chart-area{
+      height:300px;
       padding:20px;
       background:#fafafa;
       border-top:1px solid #e5e5e5;
@@ -250,7 +251,7 @@
                 Evolução da População
               </div>
 
-              <div class="fake-chart"></div>
+              <canvas id="chart-populacao"></canvas>
             </div>
           </div>
         </div>
@@ -285,7 +286,7 @@
                 Evolução das Receitas
               </div>
 
-              <div class="fake-chart"></div>
+              <canvas id="chart-receita"></canvas>
             </div>
           </div>
         </div>
@@ -320,7 +321,7 @@
                 Evolução das Despesas
               </div>
 
-              <div class="fake-chart"></div>
+              <canvas id="chart-despesa"></canvas>
             </div>
           </div>
         </div>
@@ -355,7 +356,7 @@
                 Evolução do PIB
               </div>
 
-              <div class="fake-chart"></div>
+              <canvas id="chart-pib"></canvas>
             </div>
           </div>
         </div>
@@ -389,7 +390,7 @@
         Evolução do PIB per capita
       </div>
 
-      <div class="fake-chart"></div>
+      <canvas id="chart-pibcapta"></canvas>
     </div>
   </div>
 </div>
@@ -424,7 +425,7 @@
         Evolução das receitas per capita
       </div>
 
-      <div class="fake-chart"></div>
+      <canvas id="chart-receitacapta"></canvas>
     </div>
   </div>
 </div>
@@ -436,8 +437,10 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 let database = [];
+let charts = {};
   function formatarMoeda(valor, city){
 
   // Malásia → dólar
@@ -456,6 +459,88 @@ let database = [];
     currency: 'BRL'
   });
 
+}
+function criarGrafico(canvasId, indicador, city, label){
+      .replace(/[\u0300-\u036f]/g, '')
+      ===
+    indicador
+      .trim()
+      .toLowerCase()
+
+  );
+
+  // ordenar por ano
+  dados.sort((a,b) => Number(a.ano) - Number(b.ano));
+
+  // eixo x
+  const anos = dados.map(item => item.ano);
+
+  // eixo y
+  const valores = dados.map(item => Number(item.valor));
+
+  // destruir gráfico anterior
+  if(charts[canvasId]){
+    charts[canvasId].destroy();
+  }
+
+  // criar gráfico
+  charts[canvasId] = new Chart(
+    document.getElementById(canvasId),
+    {
+      type: 'line',
+
+      data: {
+        labels: anos,
+
+        datasets: [{
+          label: label,
+          data: valores,
+          borderColor: '#0057b8',
+          backgroundColor: '#0057b8',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: false,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+
+        scales: {
+
+          x: {
+            title: {
+              display: true,
+              text: 'Ano'
+            },
+            grid: {
+              color: '#e5e5e5'
+            }
+          },
+
+          y: {
+            title: {
+              display: true,
+              text: label
+            },
+            grid: {
+              color: '#e5e5e5'
+            }
+          }
+
+        }
+      }
+    }
+  );
 }
 function atualizarIndicadores(city){
 
@@ -512,6 +597,53 @@ function atualizarIndicadores(city){
     formatarMoeda(
     pegarValor('receitacapta'),
     city
+  );
+    // POPULAÇÃO
+  criarGrafico(
+    'chart-populacao',
+    'populacao',
+    city,
+    'População'
+  );
+
+  // RECEITA
+  criarGrafico(
+    'chart-receita',
+    'receita',
+    city,
+    'Receita'
+  );
+
+  // DESPESA
+  criarGrafico(
+    'chart-despesa',
+    'despesa',
+    city,
+    'Despesa'
+  );
+
+  // PIB
+  criarGrafico(
+    'chart-pib',
+    'pib',
+    city,
+    'PIB'
+  );
+
+  // PIB PER CAPITA
+  criarGrafico(
+    'chart-pibcapta',
+    'pibcapta',
+    city,
+    'PIB Per Capita'
+  );
+
+  // RECEITA PER CAPITA
+  criarGrafico(
+    'chart-receitacapta',
+    'receitacapta',
+    city,
+    'Receita Per Capita'
   );
 }
 
