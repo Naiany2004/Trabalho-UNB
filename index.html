@@ -464,39 +464,23 @@ function atualizarIndicadores(city){
 
   // RECEITA
   document.getElementById('valor-receita').innerText =
-    pegarValor('receita').toLocaleString('pt-BR', {
-      style:'currency',
-      currency:'BRL'
-    });
+    pegarValor('receita').toLocaleString('pt-BR');
 
   // DESPESA
   document.getElementById('valor-despesa').innerText =
-    pegarValor('despesa').toLocaleString('pt-BR', {
-      style:'currency',
-      currency:'BRL'
-    });
+    pegarValor('despesa').toLocaleString('pt-BR');
 
   // PIB
   document.getElementById('valor-pib').innerText =
-    pegarValor('pib').toLocaleString('pt-BR', {
-      style:'currency',
-      currency:'BRL'
-    });
+    pegarValor('pib').toLocaleString('pt-BR');
 
   // PIB PER CAPITA
   document.getElementById('valor-pib-percapita').innerText =
-    pegarValor('pibcapta').toLocaleString('pt-BR', {
-      style:'currency',
-      currency:'BRL'
-    });
+    pegarValor('pibcapta').toLocaleString('pt-BR');
 
   // RECEITA PER CAPITA
   document.getElementById('valor-receita-percapita').innerText =
-    pegarValor('receitacapta').toLocaleString('pt-BR', {
-      style:'currency',
-      currency:'BRL'
-    });
-
+    pegarValor('receitacapta').toLocaleString('pt-BR');
 }
 
 Papa.parse("./dados.csv", {
