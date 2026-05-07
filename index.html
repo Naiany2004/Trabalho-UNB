@@ -15,6 +15,7 @@
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />  
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body{
       background:#f3f3f3;
@@ -461,13 +462,28 @@ let charts = {};
 
 }
 function criarGrafico(canvasId, indicador, city, label){
-      .replace(/[\u0300-\u036f]/g, '')
-      ===
-    indicador
+
+  // filtra indicador + cidade
+  const dados = database.filter(item => {
+
+    const cidadeCSV = item.cidade
       .trim()
       .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, '');
 
-  );
+    const indicadorCSV = item.indicador
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, '');
+
+    return (
+      cidadeCSV === city.trim().toLowerCase() &&
+      indicadorCSV === indicador.trim().toLowerCase()
+    );
+
+  });
 
   // ordenar por ano
   dados.sort((a,b) => Number(a.ano) - Number(b.ano));
@@ -483,64 +499,56 @@ function criarGrafico(canvasId, indicador, city, label){
     charts[canvasId].destroy();
   }
 
-  // criar gráfico
-  charts[canvasId] = new Chart(
-    document.getElementById(canvasId),
-    {
-      type: 'line',
+  const canvas = document.getElementById(canvasId);
 
-      data: {
-        labels: anos,
+  if(!canvas) return;
 
-        datasets: [{
-          label: label,
-          data: valores,
-          borderColor: '#0057b8',
-          backgroundColor: '#0057b8',
-          borderWidth: 3,
-          tension: 0.3,
-          fill: false,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
+  charts[canvasId] = new Chart(canvas, {
+
+    type: 'line',
+
+    data: {
+      labels: anos,
+
+      datasets: [{
+        label: label,
+        data: valores,
+        borderColor: '#0057b8',
+        backgroundColor: '#0057b8',
+        borderWidth: 3,
+        tension: 0.3,
+        fill: false,
+        pointRadius: 4
+      }]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+        legend: {
+          display: false
+        }
       },
 
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-
-        plugins: {
-          legend: {
-            display: false
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Ano'
           }
         },
 
-        scales: {
-
-          x: {
-            title: {
-              display: true,
-              text: 'Ano'
-            },
-            grid: {
-              color: '#e5e5e5'
-            }
-          },
-
-          y: {
-            title: {
-              display: true,
-              text: label
-            },
-            grid: {
-              color: '#e5e5e5'
-            }
+        y: {
+          title: {
+            display: true,
+            text: label
           }
-
         }
       }
     }
-  );
+  });
 }
 function atualizarIndicadores(city){
 
