@@ -459,96 +459,109 @@ let charts = {};
     style: 'currency',
     currency: 'BRL'
   });
-
-}
 function criarGrafico(canvasId, indicador, city, label){
 
-  // filtra indicador + cidade
-  const dados = database.filter(item => {
+  // filtra os dados
+  const dados = database.filter(item =>
 
-    const cidadeCSV = item.cidade
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, '');
+    item.cidade === city &&
+    item.indicador === indicador
 
-    const indicadorCSV = item.indicador
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, '');
+  );
 
-    return (
-      cidadeCSV === city.trim().toLowerCase() &&
-      indicadorCSV === indicador.trim().toLowerCase()
-    );
-
-  });
-
-  // ordenar por ano
-  dados.sort((a,b) => Number(a.ano) - Number(b.ano));
+  // ordena anos
+  dados.sort((a,b) =>
+    Number(a.ano) - Number(b.ano)
+  );
 
   // eixo x
   const anos = dados.map(item => item.ano);
 
   // eixo y
-  const valores = dados.map(item => Number(item.valor));
+  const valores = dados.map(item =>
+    Number(item.valor)
+  );
 
-  // destruir gráfico anterior
+  // remove gráfico anterior
   if(charts[canvasId]){
     charts[canvasId].destroy();
   }
 
-  const canvas = document.getElementById(canvasId);
+  // pega canvas
+  const canvas =
+    document.getElementById(canvasId);
 
-  if(!canvas) return;
-
+  // cria gráfico
   charts[canvasId] = new Chart(canvas, {
 
     type: 'line',
 
     data: {
+
       labels: anos,
 
       datasets: [{
+
         label: label,
+
         data: valores,
+
         borderColor: '#0057b8',
+
         backgroundColor: '#0057b8',
+
         borderWidth: 3,
+
         tension: 0.3,
+
         fill: false,
+
         pointRadius: 4
+
       }]
     },
 
     options: {
+
       responsive: true,
+
       maintainAspectRatio: false,
 
       plugins: {
+
         legend: {
           display: false
         }
+
       },
 
       scales: {
+
         x: {
+
           title: {
             display: true,
             text: 'Ano'
           }
+
         },
 
         y: {
+
           title: {
             display: true,
             text: label
           }
+
         }
+
       }
+
     }
+
   });
+
+}
 }
 function atualizarIndicadores(city){
 
